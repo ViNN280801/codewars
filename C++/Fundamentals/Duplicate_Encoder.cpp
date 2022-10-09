@@ -19,6 +19,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <map>
 
 #include <span>
 
@@ -91,8 +92,39 @@ std::string duplicate_encoder(const std::string &__word)
     return result;
 }
 
+// Returns string where
+// each character in the new string is "(" if that character
+// appears only once in the original string, or ")" if
+// that character appears more than once in the original string.
+std::string duplicate_encoder_smart(const std::string &__word)
+{
+    std::map<char, int> table;
+
+    for (auto &ch : __word)
+    {
+        table[tolower(ch)]++;
+    }
+
+    std::string result;
+    for (auto &ch : __word)
+    {
+        result += (table[tolower(ch)]==1) ? '(' : ')';
+    }
+
+    return result;
+}
+
 int main()
 {
+    std::cout << duplicate_encoder("din") << std::endl;
+    std::cout << duplicate_encoder("recede") << std::endl;
+    std::cout << duplicate_encoder("Success") << std::endl;
+    std::cout << duplicate_encoder("CodeWarrior") << std::endl;
+    std::cout << duplicate_encoder("(( @") << std::endl;
+    std::cout << duplicate_encoder(" ( ( )") << std::endl;
+
+    std::cout << "\ndubplicate_encoder_smart()" << std::endl;
+
     std::cout << duplicate_encoder("din") << std::endl;
     std::cout << duplicate_encoder("recede") << std::endl;
     std::cout << duplicate_encoder("Success") << std::endl;

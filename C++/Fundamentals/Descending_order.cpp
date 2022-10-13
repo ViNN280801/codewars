@@ -41,6 +41,14 @@ uint64_t descendingOrder(const uint64_t &__num)
     return string_to_T<uint64_t>(num_in_str);
 }
 
+// Returns '__num' in sorted view and in descending order
+uint64_t descendingOrder_smart(const uint64_t &__num)
+{
+    std::string s{std::to_string(__num)};
+    std::sort(s.rbegin(), s.rend());
+    return std::stoull(s);
+}
+
 int main()
 {
     uint64_t value{descendingOrder(0UL)};

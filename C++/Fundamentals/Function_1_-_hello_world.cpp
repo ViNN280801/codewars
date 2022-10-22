@@ -9,15 +9,17 @@
 
 #include <iostream>
 
-void greet()
+static const std::string greet_str("hello world!");
+const auto greet_lambda{[]
+                            { return greet_str; }};
+const std::string greet()
 {
-    []
-    { std::cout << "hello world" };
+    return greet_lambda();
 }
 
 int main()
 {
-    greet();
+    std::cout << greet() << std::endl;
 
     return EXIT_SUCCESS;
 }

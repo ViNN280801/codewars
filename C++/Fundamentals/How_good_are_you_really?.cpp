@@ -16,13 +16,11 @@
 #include <iterator>
 
 // Returns "true" if 'yourPoints' is greater than average of 'classPoints'
+// Otherwise returns "false"
 bool betterThanAverage(std::vector<int> classPoints, int yourPoints)
 {
-    classPoints.push_back(yourPoints);
-    return (yourPoints > std::accumulate(std::cbegin(classPoints), std::cend(classPoints), 0) /
-                             static_cast<int>(classPoints.size()))
-               ? true
-               : false;
+    return yourPoints >= std::accumulate(std::cbegin(classPoints), std::cend(classPoints), yourPoints) /
+                            static_cast<int>(classPoints.size());
 }
 
 int main()

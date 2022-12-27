@@ -196,6 +196,41 @@ std::string incrementString(const std::string &str)
     }
 }
 
+// ZealanL smart solution of this task
+std::string smart_incrementString(const std::string &str)
+{
+
+    std::string s{str};
+
+    if (s.empty() || !isdigit(s.back()))
+        return s + "1";
+
+    for (int i = s.size() - 1; i >= 0; i--)
+    {
+        char &c = s[i];
+        if (isdigit(c))
+        {
+            if (c < '9')
+            {
+                c++;
+                return s;
+            }
+            else
+            {
+                c = '0';
+                continue;
+            }
+        }
+        else
+        {
+            s.insert(i + 1, "1");
+            return s;
+        }
+    }
+
+    return s;
+}
+
 int main()
 {
     std::cout << incrementString("foobar000") << std::endl;

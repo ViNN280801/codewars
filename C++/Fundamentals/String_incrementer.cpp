@@ -14,6 +14,7 @@
 
 #include <iostream>
 #include <string>
+#include <regex>
 // Caught std::exception: what(): std::stoi()
 // Do not solve problem with big numbers
 /*
@@ -110,10 +111,35 @@ std::string incrementString(const std::string &str)
 }
 */
 
+// Returns "true" if string contains at least one digit
+// "false" - otherwise
+constexpr bool isNoDigits(const std::string &str)
+{
+    for (const auto &el : str)
+    {
+        if (isdigit(el))
+            return false;
+    }
+    return true;
+}
+
 // Returns string with incremented value in the end
 std::string incrementString(const std::string &str)
 {
-    return str;
+    // If string is empty or if it don't has digits
+    if (str.empty() or isNoDigits(str))
+        return str + "1";
+    // If the last character in string is 0 -> return substring [0; end],
+    // where str.at(end) replaces to 1
+    if (*(std::end(str) - 1) == '0')
+        return str.substr(0UL, str.length() - 1UL) + "1";
+
+    std::regex digits_re("[0-9]+$");
+
+    if (std::regex_match(str, digits_re))
+        return str;
+    else
+        return "not match";
 }
 
 int main()

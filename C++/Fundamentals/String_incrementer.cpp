@@ -42,7 +42,7 @@ constexpr int countDigits(int n)
 // Trailing nils are accounted
 // Example: "fo99obar99" -> "fo99obar" and "99"
 // "fo99obar099" -> "fo99obar0" and "99"
-std::pair<std::string, std::string> separateStrFromLastDigits(std::string str)
+std::pair<std::string, int> separateStrFromLastDigits(std::string str)
 {
     std::string lastDigits;
     size_t pos{str.length() - 1UL};
@@ -81,7 +81,7 @@ std::pair<std::string, std::string> separateStrFromLastDigits(std::string str)
         nilCounter--;
     }
 
-    return std::make_pair(str, lastDigits);
+    return std::make_pair(str, std::stoi(lastDigits));
 }
 
 // Returns string with incremented value in the end
@@ -97,14 +97,13 @@ std::string incrementString(const std::string &str)
     else
     {
         if ((*(std::cend(separateStrFromLastDigits(str).first) - 1) == '0') and
-            (countDigits(std::stoull(separateStrFromLastDigits(str).second)) <
-             countDigits(std::stoull(separateStrFromLastDigits(str).second) + 1)))
-            return separateStrFromLastDigits(str).first.substr(0UL, str.length() -
-             countDigits(std::stoull(separateStrFromLastDigits(str).second)) - 1UL) +
-                   std::to_string(std::stoull(separateStrFromLastDigits(str).second) + 1);
+            (countDigits(separateStrFromLastDigits(str).second) <
+             countDigits(separateStrFromLastDigits(str).second + 1)))
+            return separateStrFromLastDigits(str).first.substr(0UL, str.length() - countDigits(separateStrFromLastDigits(str).second) - 1UL) +
+                   std::to_string(separateStrFromLastDigits(str).second + 1);
         else
             return separateStrFromLastDigits(str).first +
-                   std::to_string(std::stoull(separateStrFromLastDigits(str).second) + 1);
+                   std::to_string(separateStrFromLastDigits(str).second + 1);
     }
 }
 

@@ -30,26 +30,58 @@ constexpr bool isNoDigits(const std::string &str)
     return true;
 }
 
+// Returns count of digits in the number 'n'
+constexpr int countDigits(int n)
+{
+    if (n / 10 == 0)
+        return 1;
+    return 1 + countDigits(n / 10);
+}
+
 // Returns string and last digits as a pair of values
+// Trailing nils are accounted
 // Example: "fo99obar99" -> "fo99obar" and "99"
-std::pair<std::string, int> separateStrFromLastDigits(std::string str)
+// "fo99obar099" -> "fo99obar0" and "99"
+std::pair<std::string, std::string> separateStrFromLastDigits(std::string str)
 {
     std::string lastDigits;
-    for (size_t i{str.length() - 1UL}; i == 0UL; i--)
+    size_t pos{str.length() - 1UL};
+    while (pos != 0UL)
     {
         // Adding to temporaly string only last digits
-        if (isdigit(str.at(i)))
+        if (isdigit(str.at(pos)))
         {
-            lastDigits.push_back(str.at(i));
-            str.erase(i);
+            lastDigits.push_back(str.at(pos));
+            // Erasing added number, to pass only string without last digits to pair
+            str.erase(pos);
         }
+        // Breaking the loop when met character
+        // to avoid iteration in all string
+        else
+            break;
+
+        pos--;
+    }
+    std::reverse(std::begin(lastDigits), std::end(lastDigits));
+
+    // Counting trailing nils
+    int nilCounter{0};
+    for (const auto &dig : lastDigits)
+    {
+        if (dig == '0')
+            nilCounter++;
         else
             break;
     }
-    std::reverse(std::begin(lastDigits), std::end(lastDigits));
-    int digits(std::stoi(lastDigits));
 
-    return std::make_pair(str, digits);
+    // Adding trailing nils to 'str'
+    while (nilCounter != 0)
+    {
+        str.push_back('0');
+        nilCounter--;
+    }
+
+    return std::make_pair(str, lastDigits);
 }
 
 // Returns string with incremented value in the end
@@ -63,7 +95,17 @@ std::string incrementString(const std::string &str)
     else if (*(std::end(str) - 1) == '0')
         return str.substr(0UL, str.length() - 1UL) + "1";
     else
-        return str;
+    {
+        if ((*(std::cend(separateStrFromLastDigits(str).first) - 1) == '0') and
+            (countDigits(std::stoull(separateStrFromLastDigits(str).second)) <
+             countDigits(std::stoull(separateStrFromLastDigits(str).second) + 1)))
+            return separateStrFromLastDigits(str).first.substr(0UL, str.length() -
+             countDigits(std::stoull(separateStrFromLastDigits(str).second)) - 1UL) +
+                   std::to_string(std::stoull(separateStrFromLastDigits(str).second) + 1);
+        else
+            return separateStrFromLastDigits(str).first +
+                   std::to_string(std::stoull(separateStrFromLastDigits(str).second) + 1);
+    }
 }
 
 int main()
@@ -81,9 +123,6 @@ int main()
     std::cout << incrementString("foo099999") << std::endl;
     std::cout << incrementString("f0o0o0b0a0r00990") << std::endl;
     std::cout << incrementString("fo99obar99") << std::endl;
-
-    std::cout << separateStrFromLastDigits("fo99obar99").first << '\t'
-              << separateStrFromLastDigits("fo99obar99").second << std::endl;
 
     return EXIT_SUCCESS;
 }

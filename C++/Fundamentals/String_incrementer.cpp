@@ -14,9 +14,11 @@
 
 #include <iostream>
 #include <string>
+// Caught std::exception: what(): std::stoi()
+// Do not solve problem with big numbers
+/*
 #include <algorithm>
 #include <iterator>
-#include <vector>
 
 // Returns "true" if string contains at least one digit
 // "false" - otherwise
@@ -42,7 +44,7 @@ constexpr int countDigits(int n)
 // Trailing nils are accounted
 // Example: "fo99obar99" -> "fo99obar" and "99"
 // "fo99obar099" -> "fo99obar0" and "99"
-std::pair<std::string, int> separateStrFromLastDigits(std::string str)
+std::pair<std::string, unsigned long long> separateStrFromLastDigits(std::string str)
 {
     std::string lastDigits;
     size_t pos{str.length() - 1UL};
@@ -81,7 +83,7 @@ std::pair<std::string, int> separateStrFromLastDigits(std::string str)
         nilCounter--;
     }
 
-    return std::make_pair(str, std::stoi(lastDigits));
+    return std::make_pair(str, std::stoull(lastDigits));
 }
 
 // Returns string with incremented value in the end
@@ -106,6 +108,13 @@ std::string incrementString(const std::string &str)
                    std::to_string(separateStrFromLastDigits(str).second + 1);
     }
 }
+*/
+
+// Returns string with incremented value in the end
+std::string incrementString(const std::string &str)
+{
+    return str;
+}
 
 int main()
 {
@@ -122,6 +131,10 @@ int main()
     std::cout << incrementString("foo099999") << std::endl;
     std::cout << incrementString("f0o0o0b0a0r00990") << std::endl;
     std::cout << incrementString("fo99obar99") << std::endl;
+    std::cout << incrementString("ryxjlgupeqyiobhlpswz050") << std::endl;
+    std::cout << incrementString("0081745667") << std::endl;
+    std::cout << incrementString("uuycxdvcpxqwrbmwxjbdtirudovwasjy405") << std::endl;
+    std::cout << incrementString("999999999999999999999999999999") << std::endl;
 
     return EXIT_SUCCESS;
 }

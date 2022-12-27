@@ -122,6 +122,20 @@ constexpr bool isNoDigits(const std::string &str)
     return true;
 }
 
+// Returns count of 9 digit in the string 'str'
+constexpr size_t countOfLast9InStr(const std::string &str)
+{
+    size_t count{0};
+    for (auto it{std::crbegin(str)}; it != std::crend(str); ++it)
+    {
+        if (*it == '9')
+            count++;
+        else
+            break;
+    }
+    return count;
+}
+
 // Returns string with incremented value in the end
 std::string incrementString(const std::string &str)
 {
@@ -132,8 +146,53 @@ std::string incrementString(const std::string &str)
     {
         if ((*(std::cend(str) - 1) - '0') < 9)
             return str.substr(0UL, str.length() - 1UL) + std::to_string(((*(std::cend(str) - 1) - '0') + 1));
+        else if (countOfLast9InStr(str) == str.length())
+        {
+            size_t count{countOfLast9InStr(str)};
+            std::string result{'1'};
+            while (count != 0)
+            {
+                result.push_back('0');
+                count--;
+            }
+            return result;
+        }
         else
-            return "empty";
+        {
+            std::string copy{str};
+            size_t count{countOfLast9InStr(copy)}, pos{copy.length() - 1UL};
+
+            while (count != 0UL)
+            {
+                copy.erase(pos);
+                count--;
+                pos--;
+            }
+
+            if ((copy.at(pos) != '9') and ((copy.at(pos) - '0') < 9))
+            {
+                copy.at(pos) = (((copy.at(pos) - '0') + 1) + '0');
+
+                count = countOfLast9InStr(str);
+                while (count != 0UL)
+                {
+                    copy.push_back('0');
+                    count--;
+                }
+                return copy;
+            }
+            else
+            {
+                count = countOfLast9InStr(str);
+                copy.push_back('1');
+                while (count != 0UL)
+                {
+                    copy.push_back('0');
+                    count--;
+                }
+                return copy;
+            }
+        }
     }
 }
 
@@ -144,6 +203,7 @@ int main()
     std::cout << incrementString("foobar001") << std::endl;
     std::cout << incrementString("foobar99") << std::endl;
     std::cout << incrementString("foobar099") << std::endl;
+    std::cout << incrementString("9999") << std::endl;
     std::cout << incrementString("") << std::endl;
     std::cout << incrementString("foobar069") << std::endl;
     std::cout << incrementString("foobar45") << std::endl;

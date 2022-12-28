@@ -19,7 +19,7 @@ constexpr int getLastDigitIfNotNull(const std::string &str)
     size_t dotPos{str.find('.')}, pos{dotPos};
     while ((pos < str.length()) and (str.at(pos) not_eq '0'))
     {
-        lastDigit = str.at(pos);
+        lastDigit = str.at(pos) - '0';
         pos++;
     }
     return lastDigit;

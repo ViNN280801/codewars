@@ -29,6 +29,12 @@ bool is_even(double n)
         return false;
 }
 
+#include <cmath>
+bool smart_isEven(double n)
+{
+    return fmod(n, 2) == 0;
+}
+
 int main()
 {
     std::cout << is_even(0) << std::endl;
@@ -38,6 +44,16 @@ int main()
     std::cout << is_even(-4) << std::endl;
     std::cout << is_even(1.743579) << std::endl;
     std::cout << is_even(1.743578) << std::endl;
+
+    std::cout << "\nSmart solution:" << std::endl;
+
+    std::cout << smart_isEven(0) << std::endl;
+    std::cout << smart_isEven(0.5) << std::endl;
+    std::cout << smart_isEven(1) << std::endl;
+    std::cout << smart_isEven(2) << std::endl;
+    std::cout << smart_isEven(-4) << std::endl;
+    std::cout << smart_isEven(1.743579) << std::endl;
+    std::cout << smart_isEven(1.743578) << std::endl;
 
     return EXIT_SUCCESS;
 }

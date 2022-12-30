@@ -16,6 +16,12 @@ constexpr T twice_as_old(T dad, T son)
     return (dad - son * 2) < 0 ? ((dad - son * 2) * (-1)) : (dad - son * 2);
 }
 
+template <std::integral T>
+constexpr T smart_twice_as_old(T dad, T son)
+{
+    return abs(dad - 2 * son);
+}
+
 int main()
 {
     std::cout << twice_as_old(36, 7) << std::endl;
@@ -23,6 +29,13 @@ int main()
     std::cout << twice_as_old(42, 21) << std::endl;
     std::cout << twice_as_old(22, 1) << std::endl;
     std::cout << twice_as_old(29, 0) << std::endl;
+
+    std::cout << "\nSmart sln:" << std::endl;
+    std::cout << smart_twice_as_old(36, 7) << std::endl;
+    std::cout << smart_twice_as_old(55, 30) << std::endl;
+    std::cout << smart_twice_as_old(42, 21) << std::endl;
+    std::cout << smart_twice_as_old(22, 1) << std::endl;
+    std::cout << smart_twice_as_old(29, 0) << std::endl;
 
     return EXIT_SUCCESS;
 }

@@ -16,13 +16,10 @@
 
 constexpr bool XO(const std::string &str)
 {
-    if (std::count_if(std::cbegin(str), std::cend(str), [](const char &ch)
-                      { return (ch == 'o') or (ch == 'O'); }) not_eq
-        std::count_if(std::cbegin(str), std::cend(str), [](const char &ch)
-                      { return ch == 'x' or (ch == 'X'); }))
-        return false;
-
-    return true;
+    return (std::count_if(std::cbegin(str), std::cend(str), [](const char &ch)
+                          { return (ch == 'o') or (ch == 'O'); }) ==
+            std::count_if(std::cbegin(str), std::cend(str), [](const char &ch)
+                          { return ch == 'x' or (ch == 'X'); }));
 }
 
 int main()

@@ -112,6 +112,28 @@ public:
         // Truncating last ' ' and '-' symbols from string, then return it
         return str.substr(0UL, str.find_last_of('-') - 1UL);
     }
+
+    static std::string stockSummaryClever(std::vector<std::string> &books, std::vector<std::string> &categories)
+    {
+        if (books.empty() || categories.empty())
+            return "";
+
+        int stocks['Z' + 1] = {0};
+        for (const std::string &book : books)
+        {
+            std::size_t position = book.find_first_of(" ", 2, 1);
+            stocks[book[0]] += std::atoi(book.data() + position);
+        }
+
+        std::string result = "";
+        for (const std::string &category : categories)
+        {
+            result = result + (result.empty() ? "" : " - ") + "(" + category[0] + " : " +
+                     std::to_string(stocks[category[0]]) + ")";
+        }
+
+        return result;
+    }
 };
 
 int main()
@@ -120,21 +142,26 @@ int main()
     std::vector<std::string> cd{"A", "B"};
 
     std::cout << StockList::stockSummary(art, cd) << std::endl;
+    std::cout << StockList::stockSummaryClever(art, cd) << std::endl;
 
     art = {"ABAR 200", "CDXE 500", "BKWR 250", "BTSQ 890", "DRTY 600"};
     std::cout << StockList::stockSummary(art, cd) << std::endl;
+    std::cout << StockList::stockSummaryClever(art, cd) << std::endl;
 
     art = {"BBAR 150", "CDXE 515", "BKWR 250", "BTSQ 890", "DRTY 600"};
     cd = {"A", "B", "C", "D"};
     std::cout << StockList::stockSummary(art, cd) << std::endl;
+    std::cout << StockList::stockSummaryClever(art, cd) << std::endl;
 
     art = {"ROXANNE 102", "RHODODE 123", "BKWRKAA 125", "BTSQZFG 239", "DRTYMKH 060"};
     cd = {"B", "R", "D", "X"};
     std::cout << StockList::stockSummary(art, cd) << std::endl;
+    std::cout << StockList::stockSummaryClever(art, cd) << std::endl;
 
     art = {};
     cd = {"B", "R", "D", "X"};
     std::cout << StockList::stockSummary(art, cd) << std::endl;
+    std::cout << StockList::stockSummaryClever(art, cd) << std::endl;
 
     return EXIT_SUCCESS;
 }

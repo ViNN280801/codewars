@@ -74,6 +74,28 @@ struct Decoder
 
         return decryptedStr;
     }
+
+    static std::string decode_top(const std::string &p_what)
+    {
+        std::string key = std::string("aHqPuRvkM07DoO1AU49EW5CVxlfcIY6.? GXyTwS3BngKZzmNtjeJriLsQ28,Fphdb");
+
+        std::string result = std::string("");
+        for (const char &c : p_what)
+        {
+            int index = key.find(c);
+            result += (index != std::string::npos) ? key[(index + result.size() + 1) % key.size()] : c;
+        }
+
+        return result;
+    }
+
+    static std::string decode_clever(const std::string &p_what)
+    {
+        std::string result(p_what);
+        for (int i{}; i < 65; i++)
+            result = Encoder::encode(result);
+        return result;
+    }
 };
 
 int main()

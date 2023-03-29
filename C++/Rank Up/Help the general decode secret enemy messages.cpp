@@ -77,12 +77,12 @@ struct Decoder
 
     static std::string decode_top(const std::string &p_what)
     {
-        std::string key = std::string("aHqPuRvkM07DoO1AU49EW5CVxlfcIY6.? GXyTwS3BngKZzmNtjeJriLsQ28,Fphdb");
+        std::string key("aHqPuRvkM07DoO1AU49EW5CVxlfcIY6.? GXyTwS3BngKZzmNtjeJriLsQ28,Fphdb");
 
-        std::string result = std::string("");
+        std::string result("");
         for (const char &c : p_what)
         {
-            int index = key.find(c);
+            size_t index{key.find(c)};
             result += (index != std::string::npos) ? key[(index + result.size() + 1) % key.size()] : c;
         }
 
@@ -97,7 +97,7 @@ struct Decoder
         return result;
     }
 };
-
+\
 int main()
 {
     std::cout << "Encrypting..." << std::endl;

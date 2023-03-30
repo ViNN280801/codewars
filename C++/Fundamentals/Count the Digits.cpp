@@ -12,7 +12,7 @@ public:
         std::string str{};
         for (int i{0}; i <= n; i++)
         {
-            str += std::to_string(static_cast<int>(std::pow(static_cast<long double>(i), 2.0)));
+            str += std::to_string(static_cast<int>(i * i));
         }
         return std::count_if(std::cbegin(str), std::cend(str), [&](char const &ch)
                              { return ch == (d + '0'); });

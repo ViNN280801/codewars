@@ -46,8 +46,6 @@
 #include <string>
 #include <algorithm>
 #include <iterator>
-#include <vector>
-#include <sstream>
 
 // Simple lambda expr that defines if 'ch' symbol is mathematical operation sign
 constexpr auto isMathSign{[](char const &ch)
@@ -222,30 +220,6 @@ std::string calcWholeExpression(std::string const &expr)
     return exprCopy;
 }
 
-// Returns double value from the string representation with specified precision
-double stringToDoubleWithPrecision(std::string const &num, int const &precision)
-{
-    std::stringstream ss;
-
-    // Setting the precision: +/- 1e-6
-    ss.precision(precision);
-
-    // Put 'num' to string stream 'ss' with specified precision
-    ss << std::fixed << num;
-    double res{};
-
-    // Returning from string stream number with specified precision
-    ss >> res;
-
-    /*                 ATTENTION TO THIS PLS               */
-    /* =================================================== */
-    /* 'ss.str()' has 6 signs after dot, but 'res' isn't!  */
-    /* std::cout << ss.str() << std::endl;                 */
-    /* =================================================== */
-
-    return res;
-}
-
 double calc(std::string expr)
 {
     // If we got an empty string - return nil as a result
@@ -276,7 +250,7 @@ double calc(std::string expr)
         // Erasing expression in parentheses
         expr.erase(posOflbracket, exprInParentheses.length() + 2UL);
 
-        // Replasing erased expression in parentheses with a calculation resul
+        // Replacing erased expression in parentheses with a calculation result
         expr.insert(posOflbracket, calcWholeExpression(exprInParentheses));
     }
 
@@ -288,11 +262,11 @@ double calc(std::string expr)
         // Erasing all symbols in the expression
         expr.clear();
 
-        // Replasing erased expression in parentheses with a calculation resul
+        // Replacing erased expression in parentheses with a calculation result
         expr.insert(0UL, calculated);
     }
 
-    return stringToDoubleWithPrecision(expr, 6);
+    return std::stod(expr);
 }
 
 int main()

@@ -201,6 +201,7 @@ std::string calcWholeExpression(std::string const &expr)
 
     // Getting rid of unnecessary repetitive characters
     replaceDoubleSignsInExpr(exprCopy, "--");
+    replaceDoubleSignsInExpr(exprCopy, "-+");
     replaceDoubleSignsInExpr(exprCopy, "+-");
     replaceDoubleSignsInExpr(exprCopy, "++");
 
@@ -265,8 +266,7 @@ double calc(std::string expr)
         // Replacing erased expression in parentheses with a calculation result
         expr.insert(0UL, calculated);
     }
-
-    return std::stod(expr);
+    return std::stold(expr);
 }
 
 int main()
@@ -302,6 +302,7 @@ int main()
     std::cout << calc(" 0 ") << std::endl;
     std::cout << calc("-16 / -42 / -42 - -94 - 12 + 76 / -89 * -100") << std::endl;
     std::cout << calc("77 / 83 / 82 * -7 * -10 - 38 - -35 - 37") << std::endl;
+    std::cout << calc("-(-(-1))") << std::endl;
 
     return EXIT_SUCCESS;
 }

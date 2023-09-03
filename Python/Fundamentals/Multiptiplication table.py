@@ -23,4 +23,8 @@ def multiplication_table(size: int) -> list[list[int]]:
     return result
 
 
+def multiplicationTable(size):
+    return [[j*i for j in range(1, size+1)] for i in range(1, size+1)]
+
+
 print(multiplication_table(3))

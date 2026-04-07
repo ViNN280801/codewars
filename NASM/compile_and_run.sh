@@ -28,7 +28,7 @@ echo "==> Assembling $ASM_FILE..."
 nasm -f elf64 "$ASM_FILE" -o "$OBJ_ASM"
 
 echo "==> Compiling and linking $CPP_FILE..."
-clang++ -std=c++17 -O0 -g -Wall -Wpedantic -Wextra -Wshadow -Wnarrowing -fsanitize=address,undefined,leak \
+clang++ -std=c++17 -O0 -g -fPIE -Wall -Wpedantic -Wextra -Wshadow -Wnarrowing -fsanitize=address,undefined,leak \
         "$CPP_FILE" "$OBJ_ASM" \
          -lgtest -lgtest_main -lpthread \
          -o "$OBJ_OUT"

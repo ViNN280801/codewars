@@ -168,6 +168,27 @@ sum_array:
 ; Подсказка: итерируй как в bin_to_dec,
 ; сравнивай текущий байт с sil через cmp.
 ; ===== ==== =====
+count_char:
+  xor eax, eax  ; обнуляем результирующий регистр eax
+  xor rcx, rcx  ; обнуляем регистр счетчика rcx
+
+  test rdi, rdi         ; если в rdi был передан нулевой адрес - выходим из функции
+  jz   .count_char_end
+
+  .count_char_loop:
+    movzx edx, byte [rdi + rcx]        ; читаем 1 байт в edx
+    test  edx, edx                     ; проверяем *rdi+rcx, что он не '\0'
+    jz    .count_char_end              ; если '\0' - выходим
+    inc   rcx                          ; инкрементируем счетчик цикла
+    cmp   dl, sil                      ; сравниваем байт dl с переданным sl (char c)
+    jne   .count_char_skip             ; если *rdx+rcx != rsi, то пропускаем шаг
+    inc   eax                          ; иначе инкрементируем результат
+
+  .count_char_skip:
+    jmp .count_char_loop ; делаем петлю для цикла
+
+  .count_char_end:
+    ret   ; возвращаем поток управления
 
 ; ==== Task 7 ====
 ; global is_power_of_two

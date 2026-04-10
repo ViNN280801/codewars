@@ -1,9 +1,8 @@
 #include <algorithm>
 #include <iterator>
-#include <limits>
+#include <cstring>
 #include <numeric>
 #include <random>
-#include <unistd.h>
 #include <vector>
 
 #include <gtest/gtest.h>
@@ -12,8 +11,12 @@
   #define N 1'000'000
 #endif
 
-#ifndef N_arr
-  #define N_arr 1'000
+#ifndef N_arr // Size of array
+  #define N_arr 100'000
+#endif
+
+#ifndef N_iterations // Number of iterations in loops
+  #define N_iterations 3'000
 #endif
 
 extern "C" {
@@ -22,23 +25,40 @@ extern "C" {
   int abs_val(int);
   int max_of_two(int, int);
   int sum_array(int const*, int);
+  int count_char(char const *, char);
 }
 
 namespace {
   std::random_device                 _g_rd;
   std::mt19937                       _g_gen(_g_rd());
-  std::uniform_int_distribution<int> _g_distr(-N, N);
 
-  int _get_random_int() { return _g_distr(_g_gen); }
-  int _get_random_int_par(int lower_bound, int upper_bound) // par -> parametrized
-  {
-    std::uniform_int_distribution<int> distr(lower_bound, upper_bound);
+  template <typename T = int>
+  int _get_random() {
+    std::uniform_int_distribution<T> distr(-N, N);
     return distr(_g_gen);
   }
-  std::vector<int> _get_random_int_vector(int size) {
-    std::vector<int> v;
+
+  template <typename T = int>
+  int _get_random_par(T lower_bound, T upper_bound) // par -> parametrized
+  {
+    std::uniform_int_distribution<T> distr(lower_bound, upper_bound);
+    return distr(_g_gen);
+  }
+
+  template <typename T = int>
+  std::vector<T> _get_random_vector(int size) {
+    std::vector<T> v;
     v.reserve(size);
-    std::generate_n(std::back_inserter(v), size, _get_random_int);
+    std::generate_n(std::back_inserter(v), size, _get_random<T>);
+    return v;
+  }
+
+  template <typename T = int>
+  std::vector<T> _get_random_vector_par(int size, T lower_bound, T upper_bound) {
+    std::vector<T> v;
+    v.reserve(size);
+    std::uniform_int_distribution<T> distr(lower_bound, upper_bound);
+    std::generate_n(std::back_inserter(v), size, [&](){ return distr(_g_gen); });
     return v;
   }
 } // anonymous namespace
@@ -75,8 +95,8 @@ TEST(NASMTestsOwnTasks, max_of_two_test)
   auto max_of_two_checker = [](int a, int b) { return std::max(a, b); };
   for (int i = -N; i < N; ++i)
   {
-    int a = _get_random_int();
-    int b = _get_random_int();
+    int a = _get_random();
+    int b = _get_random();
 
     EXPECT_TRUE(max_of_two(a, b) == max_of_two_checker(a, b));
   }
@@ -102,10 +122,33 @@ TEST(NASMTestsOwnTasks, sum_array_test)
   EXPECT_EQ(sum_array(edge2.data(), -3), sum_array_checker(edge2.data(), -3));
 
   // Default cases
-  for (int arr_count = 0; arr_count < N; ++arr_count)
+  for (int iteration = 0; iteration < N_iterations; ++iteration)
   {
-    auto v = _get_random_int_vector(_get_random_int_par(0, N_arr));
+    auto v = _get_random_vector(_get_random_par(0, N_arr));
     EXPECT_EQ(sum_array(v.data(), v.size()), sum_array_checker(v.data(), v.size()));
+  }
+}
+
+TEST(NASMTestsOwnTasks, count_char)
+{
+  auto count_char_checker = [](char const *s, char c){
+    /* return static_cast<int>(std::count_if(s, s + strlen(s), [c](char a){ return a == c; })); */
+    int count = 0;
+    while (*s != 0) if (*(s++) == c) ++count;
+    return count;
+  };
+
+  for (int iteration = 0; iteration < N_iterations; ++iteration)
+  {
+    int size = _get_random_par(0, N_arr);
+    auto v = _get_random_vector_par<char>(size, 0x01, 0x7F);
+    v.push_back('\0');
+    char searching = static_cast<char>(_get_random_par(0x01, 0x7F));
+
+    int test = count_char(v.data(), searching);
+    int expected = count_char_checker(v.data(), searching);
+
+    EXPECT_EQ(test, expected);
   }
 }
 

@@ -110,13 +110,13 @@ abs_val:
   jl  .abs_val_negate ; jump if lower (SF!=OF) => (Sign Flag != Overflow Flag), т.е. старший бит = 0 != нет знакового переполнения
   jmp .abs_val_done
 
-.abs_val_negate:
-  neg edi   ; добавляем унарный - к edi
-  jmp .abs_val_done
+  .abs_val_negate:
+    neg edi   ; добавляем унарный - к edi
+    jmp .abs_val_done
 
-.abs_val_done:
-  mov eax, edi ; записываем результат в eax
-  ret
+  .abs_val_done:
+    mov eax, edi ; записываем результат в eax
+    ret
 
 ; ==== Task 4 ====
 ; global max_of_two
@@ -125,6 +125,11 @@ abs_val:
 ; a приходит в edi, b приходит в esi.
 ; Подсказка: cmp + cmov (без явного jmp!).
 ; ===== ==== =====
+max_of_two:
+  mov    eax, esi   ; перемещаем 2-й аргумент в результат
+  cmp    eax, edi   ; edi - 1-й аргумент, esi - 2-й аргумент; сравниваем их
+  cmovl  eax, edi   ; if (eax < edi)  eax = edi
+  ret
 
 ; ==== Task 5 ====
 ; global sum_array
@@ -134,6 +139,26 @@ abs_val:
 ; Подсказка: цикл с dec + jnz,
 ; читай элементы через [rdi + rcx*4].
 ; ===== ==== =====
+sum_array:
+  xor eax, eax    ; eax = 0, выступает в качестве аккумулятора (итоговой суммы)
+  xor ecx, ecx    ; ecx = 0, выступает в роли счетчика по циклу
+
+  test rdi, rdi       ; if (rdi == NULL) -> exit
+  jz  .sum_array_end
+
+  test esi, esi          ; if (esi <= 0) -> exit
+  jle  .sum_array_end
+
+  .sum_array_loop:
+    cmp ecx, esi        ; сравниваем ecx и esi, где esi - второй аргумент, он же размер массива
+    jge .sum_array_end  ; if (ecx >= esi) -> выход
+
+    add eax, [rdi + rcx * 4] ; eax += [rdi + rcx*4], 4 потому что sizeof(int) на x64 = 4 байта
+    inc ecx                  ; ++ecx
+    jmp .sum_array_loop      ; переходим на начало цикла
+
+  .sum_array_end:
+    ret
 
 ; ==== Task 6 ====
 ; global count_char

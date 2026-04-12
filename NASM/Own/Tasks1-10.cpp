@@ -26,6 +26,8 @@ extern "C" {
   int max_of_two(int, int);
   int sum_array(int const*, int);
   int count_char(char const *, char);
+  int is_power_of_two(unsigned int);
+  long long fib(int);
 }
 
 namespace {
@@ -132,7 +134,7 @@ TEST(NASMTestsOwnTasks, sum_array_test)
 TEST(NASMTestsOwnTasks, count_char)
 {
   auto count_char_checker = [](char const *s, char c){
-    /* return static_cast<int>(std::count_if(s, s + strlen(s), [c](char a){ return a == c; })); */
+    // return static_cast<int>(std::count_if(s, s + strlen(s), [c](char a){ return a == c; }));
     int count = 0;
     while (*s != 0) if (*(s++) == c) ++count;
     return count;
@@ -149,6 +151,42 @@ TEST(NASMTestsOwnTasks, count_char)
     int expected = count_char_checker(v.data(), searching);
 
     EXPECT_EQ(test, expected);
+  }
+}
+
+
+TEST(NASMTestsOwnTasks, is_power_of_two_test)
+{
+  auto is_power_of_two_checker = [](unsigned int n) -> int  { return (n > 0) && ((n & (n - 1)) == 0); };
+  for (int num = 0; num < N; ++num)
+  {
+    EXPECT_EQ(is_power_of_two(num), is_power_of_two_checker(num));
+  }
+}
+
+
+TEST(NASMTestsOwnTasks, fib_test)
+{
+  using int64 = long long;
+  auto fib_checker = [](int n) -> int64 {
+    if (n <= 1) return n;
+
+    int64 a    = 0;
+    int64 b    = 1;
+    int64 next = -1;
+
+    for (decltype(n) i = 1; i <= n; ++i)
+    {
+      next = a + b;
+      a    = b;
+      b    = next;
+    }
+    return b;
+  };
+
+  for (int num = -N; num < 60; ++num)
+  {
+    EXPECT_EQ(fib(num), fib_checker(num));
   }
 }
 

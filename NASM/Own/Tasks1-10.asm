@@ -14,7 +14,7 @@ global abs_val
 global max_of_two
 global sum_array
 global count_char
-global power_of_two
+global is_power_of_two
 global fib
 global str_len
 global make_squares
@@ -198,16 +198,64 @@ count_char:
 ; Классический трюк: n & (n-1) == 0.
 ; Также n не должно быть равно 0.
 ; ===== ==== =====
+is_power_of_two:
+  xor  eax, eax                 ; eax = 0
+  test edi, edi                 ; если edi <= 0, то выходим из функции
+  jle  .is_power_of_two_lezero
+
+  lea  ecx, [edi-1]  ; ecx = edi-1
+  and  edi, ecx      ; edi & ecx => edi & (edi-1)
+  test edi, edi      ; установка флагов для edi
+  setz al            ; если ZF=1, то устанавливаем 1 бит в al
+  ret
+
+  .is_power_of_two_lezero:
+    ret
 
 ; ==== Task 8 ====
 ; global fib
-; int fib(int n)
+; long long fib(int n)
 ; Верни n-е число Фибоначчи (fib(0)=0, fib(1)=1).
 ; Подсказка: тебе нужны два регистра для
 ; предыдущего и текущего значения.
 ; Используй loop или dec + jnz.
 ; Не используй рекурсию.
 ; ===== ==== =====
+fib:
+  cmp  edi, 1      ; if (edi <= 1) -> goto .fib_leone
+  jle  .fib_leone
+
+  push r12 ; prev
+  push r13 ; cur
+  push r14 ; next
+
+  xor r12, r12  ; prev = 0
+  mov r13, 1    ; cur  = 1
+                ; r14 is next
+
+  mov ecx, 1    ; i = 1
+
+  .fib_loop:
+    lea r14, [r12 + r13] ; next = prev + cur
+    mov r12, r13         ; prev = cur
+    mov r13, r14         ; cur  = next
+
+    inc ecx   ; ++i
+
+    cmp ecx, edi   ; if (ecx <= edi) -> goto .fib_loop
+    jle .fib_loop
+
+  mov rax, r13   ; rax = cur
+
+  pop r12
+  pop r13
+  pop r14
+
+  ret
+
+  .fib_leone:
+    movsxd rax, edi   ; rax = edi with sing extend
+    ret
 
 ; ==== Task 9 ====
 ; global str_len

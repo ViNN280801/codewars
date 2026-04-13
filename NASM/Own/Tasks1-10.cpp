@@ -28,6 +28,7 @@ extern "C" {
   int count_char(char const *, char);
   int is_power_of_two(unsigned int);
   long long fib(int);
+  size_t str_len(char const *str);
 }
 
 namespace {
@@ -187,6 +188,29 @@ TEST(NASMTestsOwnTasks, fib_test)
   for (int num = -N; num < 60; ++num)
   {
     EXPECT_EQ(fib(num), fib_checker(num));
+  }
+}
+
+TEST(NASMTestsOwnTasks, str_len)
+{
+  auto str_len_checker = [](char const *str){
+    size_t length = 0ULL;
+    while (*(str++) != 0) ++length;
+    return length;
+  };
+  for (int iteration = 0; iteration < N_iterations; ++iteration)
+  {
+    int size = _get_random_par(0, N_arr);
+    auto v = _get_random_vector_par<char>(size, 0x01, 0x7F);
+    v.push_back('\0');
+    size_t test     = str_len(v.data());
+    size_t expected = str_len_checker(v.data());
+
+    size_t expectedlibfunc = std::strlen(v.data());
+
+    EXPECT_EQ(expected, expectedlibfunc);
+    EXPECT_EQ(test, expected);
+    EXPECT_EQ(test, expectedlibfunc);
   }
 }
 

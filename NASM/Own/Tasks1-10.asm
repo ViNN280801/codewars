@@ -266,6 +266,19 @@ fib:
 ; итерируй по байтам пока не встретишь 0.
 ; Считай количество байт до нуля.
 ; ===== ==== =====
+str_len:
+  xor   rax, rax      ; rax = 0
+
+  .str_len_loop:
+    movzx rdx, byte [rdi + rax] ; читаем один байт строки в edx: rdx = *(rdi + counter)
+    test  rdx, rdx              ; if (rcx == 0) -> break loop
+    jz   .str_len_end
+    inc  rax                    ; ++rax (counter)
+    test rcx, rcx               ; if (rcx != 0) -> goto begin of loop  
+    jne  .str_len_loop
+
+  .str_len_end:
+    ret
 
 ; ==== Task 10 ====
 ; global make_squares

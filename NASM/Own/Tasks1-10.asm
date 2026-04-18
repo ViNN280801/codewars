@@ -5,7 +5,8 @@
 ; =============================================================
 
 ; ---- external symbols ----
-; -------------------------
+extern malloc
+; --------------------------
 
 ; ---- exporting symbols ----
 global double_it
@@ -292,5 +293,44 @@ str_len:
 ; тот же паттерн с malloc и проверкой NULL.
 ; Для квадрата используй imul.
 ; ===== ==== =====
+make_squares:
+  xor  rax, rax   ; rax = 0
+  test edi, edi   ; if n <= 0 -> return nullptr
+  jle  .make_squares_end
+  test rsi, rsi   ; if out_size == nullptr -> return nullptr
+  jz   .make_squares_end
+
+  push rbp ; saving frame ptr to call malloc
+  push rbx ; will store `n` to call malloc
+  push r12 ; will store `n_copy` for in-loop action with cmp of size (i < n)
+
+  mov  rbx, rsi  ; saving out_size before calling malloc
+  mov  r12, rdi  ; saving edi before changing
+  shl  edi, 2    ; n *= 4 => sizeof(int) on x64 is 4 bytes
+  call malloc    ; same as malloc(n)
+
+  test rax, rax  ; if result of malloc is nullptr we need to return with nullptr
+  jz   .make_squares_end
+
+  xor rcx, rcx ; loop counter (aka `i`) = 0
+
+  .make_squares_loop:
+    lea  rdx,     [rcx+1] ; rdx += 1
+    imul rdx,         rdx ; rdx *= rdx
+    mov  [rax+rcx*4], edx ; rax = doubled rdx
+    inc  rcx              ; ++i
+
+    cmp  rcx, r12 ; if (i < n) -> making loop
+    jl   .make_squares_loop
+
+  mov [rbx], r12 ; *out_size = r12 (aka *out_size = n) after loop
+
+  ; restoring registers after use
+  pop r12
+  pop rbx
+  pop rbp
+
+  .make_squares_end:
+    ret
 
 section .note.GNU-stack noalloc noexec nowrite progbits

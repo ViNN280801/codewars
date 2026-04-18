@@ -29,6 +29,7 @@ extern "C" {
   int is_power_of_two(unsigned int);
   long long fib(int);
   size_t str_len(char const *str);
+  int *make_squares(int n, size_t *out_size);
 }
 
 namespace {
@@ -194,7 +195,7 @@ TEST(NASMTestsOwnTasks, fib_test)
 TEST(NASMTestsOwnTasks, str_len)
 {
   auto str_len_checker = [](char const *str){
-    size_t length = 0ULL;
+    std::size_t length = 0ULL;
     while (*(str++) != 0) ++length;
     return length;
   };
@@ -203,15 +204,47 @@ TEST(NASMTestsOwnTasks, str_len)
     int size = _get_random_par(0, N_arr);
     auto v = _get_random_vector_par<char>(size, 0x01, 0x7F);
     v.push_back('\0');
-    size_t test     = str_len(v.data());
-    size_t expected = str_len_checker(v.data());
+    std::size_t test     = str_len(v.data());
+    std::size_t expected = str_len_checker(v.data());
 
-    size_t expectedlibfunc = std::strlen(v.data());
+    std::size_t expectedlibfunc = std::strlen(v.data());
 
     EXPECT_EQ(expected, expectedlibfunc);
     EXPECT_EQ(test, expected);
     EXPECT_EQ(test, expectedlibfunc);
   }
+}
+
+TEST(NASMTestsOwnTasks, make_squares)
+{
+  auto make_squares_checker = [](int n, std::size_t *out_size) -> int* {
+    if ((n <= 0) || (out_size == nullptr)) return nullptr;
+    int *res = new int[n];
+    if (res == nullptr) return nullptr;
+    for (int i = 0; i < n; ++i) res[i] = (i + 1) * (i + 1);
+    *out_size = n;
+    return res;
+  };
+  for (int iteration = 0; iteration < N_iterations; ++iteration)
+  {
+    int size = _get_random_par(0, N_arr);
+    auto v = _get_random_vector_par(size, -10'000, 10'000);
+
+    std::size_t test_size = 0ULL;
+    int *test             = make_squares(size, &test_size);
+
+    std::size_t expected_size = 0ULL;
+    int *expected             = make_squares_checker(size, &expected_size);
+
+    EXPECT_EQ(test_size, expected_size);
+    for (std::size_t i = 0ULL; i < test_size; ++i)
+    {
+      EXPECT_EQ(test[i], expected[i]);
+    }
+
+    free(test);
+    delete[] expected;
+ }
 }
 
 int main(int argc, char **argv)

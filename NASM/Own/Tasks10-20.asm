@@ -51,6 +51,58 @@ gcd:
       mov eax, esi
       ret
 
+; Clang's 22.1.0 -O2 std::gcd analysis and reverting to C code:
+std_gcd(int, int):
+        ; Used registers:
+        ;   r8d - temp variable to interoperate with result
+        ;   ecx - variable for the ctz result
+        ;   edx - second variable for the ctz result
+
+        mov     r8d, edi        ; r8d = edi => r8d = a => 5th arg (System V) 32 bit
+        neg     r8d             ; r8d = -r8d
+        cmovs   r8d, edi        ; if (edi is signed (SF=1)) => r8d = edi => r8d = a; r8d = (edi < 0) ? edi : r8d; r8d = (a < 0) ? a : r8d;
+        mov     eax, esi        ; eax (result register) = esi => eax = b
+        neg     eax             ; eax = -eax
+        cmovs   eax, esi        ; if (esi is signed (SF=1)) => eax = esi => eax = a; eax = (SF=1) ? esi : eax; eax = (esi < 0) ? esi : eax;
+        test    edi, edi        ; edi & edi => a & a
+        je      .LBB0_6         ; if (edi == 0) => if (a == 0) -> goto .LBB0_6
+        test    esi, esi        ; esi & esi => b & b
+        je      .LBB0_2         ; if (esi == 0) => if (b == 0) -> goto .LBB0_2
+        rep       bsf edi, edi  ; edi = ctz(edi) => edi = trailing zeros count in edi (a)
+        mov     ecx, edi        ; ecx = edi => ecx = a; ecx is a 4th arg (loop counter)
+        shr     r8d, cl         ; r8d >>= cl (1 byte register); shr -> shift right <-> div to 2
+        rep       bsf edx, esi  ; edx = ctz(esi) => edx = ctz(b)
+        mov     ecx, edx        ; ecx = edx
+        shr     eax, cl         ; eax >>= cl
+        cmp     edi, edx        ; comparing edi with edx
+        cmovb   edx, edi        ; edx = (CF=1) ? edi : edx; b - means below; edx = (edx < edi) ? edi : edx;
+        cmp     r8d, eax        ; comparing r8d with eax
+.LBB0_4:
+        mov     esi, eax        ; esi = eax; b = eax
+        cmovb   esi, r8d        ; using result of comparing `cmp r8d, eax`; esi = (esi < r8d) ? r8d : esi => b = (b < r8d) ? r8d : b
+        je      .LBB0_5         ; if (r8d == eax) goto .LBB0_5
+        cmp     r8d, eax        ; comparing r8d with eax
+        cmova   eax, r8d        ; eax = (eax > r8d) ? r8d : eax
+        mov     r8d, esi        ; r8d = esi; r8d = b
+        sub     eax, esi        ; eax -= esi; eax -= b
+        rep       bsf ecx, eax  ; ecx = ctz(eax)
+        shr     eax, cl         ; eax >>= cl
+        cmp     esi, eax        ; comparing esi (aka `b`) with eax
+        jmp     .LBB0_4         ; goto .LBB0_4 (.LBB0_4 is a loop while)
+.LBB0_5:
+        mov     ecx, edx        ; ecx = edx
+        shl     esi, cl         ; esi <<= cl => b <<= cl
+        mov     eax, esi        ; eax = esi  => eax = b
+.LBB0_6:
+        ret                     ; end of the control flow for this function
+.LBB0_2:
+        mov     eax, r8d        ; eax = r8d
+        ret                     ; end of the control flow for this function
+
+
+; C level 1 reversing: https://godbolt.org/z/13cq57z34
+; C level 2 upgrading: https://godbolt.org/z/1bjYe9sdd
+
 ; ==== Task 2 ====
 ; global popcount
 ; unsigned int popcount(unsigned int n)
